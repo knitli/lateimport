@@ -7,19 +7,19 @@
 
 Provides two complementary tools:
 
-``LazyImport`` / ``lazy_import``
+``LateImport`` / ``lateimport``
     A proxy object for explicit lazy imports in application code. The module
     is not imported (and the attribute is not accessed) until the object is
     actually *used* — called, passed to isinstance, subscripted, etc.
 
     Usage::
 
-        from lateimport import lazy_import
+        from lateimport import lateimport
 
-        numpy = lazy_import("numpy")  # no import yet
+        numpy = lateimport("numpy")  # no import yet
         result = numpy.array([1, 2, 3])  # imported here
 
-``create_lazy_getattr``
+``create_late_getattr``
     Factory for the ``__getattr__`` hook embedded in package ``__init__.py``
     files that use a ``_dynamic_imports`` dispatch table. Used by Exportify
     when generating ``__init__.py`` files; also available directly for
@@ -28,10 +28,10 @@ Provides two complementary tools:
     Usage::
 
         from types import MappingProxyType
-        from lateimport import create_lazy_getattr
+        from lateimport import create_late_getattr
 
         _dynamic_imports = MappingProxyType({"MyClass": ("mypackage.core", "models")})
-        __getattr__ = create_lazy_getattr(_dynamic_imports, globals(), __name__)
+        __getattr__ = create_late_getattr(_dynamic_imports, globals(), __name__)
 """
 
 from __future__ import annotations
@@ -69,7 +69,7 @@ typing machinery, etc.) and must not be proxied.
 """
 
 
-class LazyImport[Import: Any]:
+class LateImport[Import: Any]:
     """Proxy that defers both module import and attribute access until use.
 
     The import is triggered the first time the object is *used* — called,
@@ -80,7 +80,7 @@ class LazyImport[Import: Any]:
 
     Example::
 
-        heavy = lazy_import("heavy_module", "SomeClass")
+        heavy = lateimport("heavy_module", "SomeClass")
         # heavy_module is not imported yet
         instance = heavy()
         # heavy_module.SomeClass is imported and called here
@@ -152,7 +152,7 @@ class LazyImport[Import: Any]:
     # Proxy protocol
     # ------------------------------------------------------------------
 
-    def __getattr__(self, name: str) -> LazyImport[Import]:
+    def __getattr__(self, name: str) -> LateImport[Import]:
         """Return a child proxy for ``name``, or resolve immediately for introspection attrs."""
         if name in INTROSPECTION_ATTRIBUTES:
             try:
@@ -165,7 +165,7 @@ class LazyImport[Import: Any]:
 
         module_name = object.__getattribute__(self, "_module_name")
         attrs = object.__getattribute__(self, "_attrs")
-        child: LazyImport[Import] = LazyImport(module_name, *attrs, name)
+        child: LateImport[Import] = LateImport(module_name, *attrs, name)
         object.__setattr__(child, "_parent", self)
         return child
 
@@ -188,7 +188,7 @@ class LazyImport[Import: Any]:
         resolved = object.__getattribute__(self, "_resolved")
         path = f"{module_name}.{'.'.join(attrs)}" if attrs else module_name
         status = "resolved" if resolved is not None else "pending"
-        return f"<LazyImport {path!r} ({status})>"
+        return f"<LateImport {path!r} ({status})>"
 
     # ------------------------------------------------------------------
     # Introspection
@@ -204,25 +204,25 @@ class LazyImport[Import: Any]:
 # ------------------------------------------------------------------
 
 
-def lazy_import[Import: Any](module_name: str, *attrs: str) -> LazyImport[Import]:
-    """Create a :class:`LazyImport` proxy for *module_name*.
+def lateimport[Import: Any](module_name: str, *attrs: str) -> LateImport[Import]:
+    """Create a :class:`LateImport` proxy for *module_name*.
 
     Args:
         module_name: Dotted module path to import.
         *attrs: Optional attribute chain to traverse after import.
 
     Returns:
-        A :class:`LazyImport` proxy that resolves on first use.
+        A :class:`LateImport` proxy that resolves on first use.
 
     Example::
 
-        np = lazy_import("numpy")
-        join = lazy_import("os.path", "join")
+        np = lateimport("numpy")
+        join = lateimport("os.path", "join")
     """
-    return LazyImport(module_name, *attrs)
+    return LateImport(module_name, *attrs)
 
 
-def create_lazy_getattr(
+def create_late_getattr(
     dynamic_imports: MappingProxyType[str, tuple[str, str]],
     module_globals: dict[str, object],
     module_name: str,
@@ -235,7 +235,7 @@ def create_lazy_getattr(
         _dynamic_imports = MappingProxyType({
             "SymbolName": ("package.submodule", "module_file")
         })
-        __getattr__ = create_lazy_getattr(_dynamic_imports, globals(), __name__)
+        __getattr__ = create_late_getattr(_dynamic_imports, globals(), __name__)
 
     The tuple value is ``(package, target_module)`` where:
 
@@ -275,9 +275,9 @@ def create_lazy_getattr(
     __getattr__.__module__ = module_name
     __getattr__.__doc__ = (
         f"Lazy-import ``__getattr__`` for {module_name!r}. "
-        "Generated by lateimport.create_lazy_getattr."
+        "Generated by lateimport.create_late_getattr."
     )
     return __getattr__
 
 
-__all__ = ("INTROSPECTION_ATTRIBUTES", "LazyImport", "create_lazy_getattr", "lazy_import")
+__all__ = ("INTROSPECTION_ATTRIBUTES", "LateImport", "create_late_getattr", "lateimport")

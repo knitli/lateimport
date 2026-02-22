@@ -6,7 +6,7 @@
 [project]
 name = "lateimport"
 version = "0.1.0"
-description = "Lazy import utilities for deferred module loading and attribute access."
+description = "Lazy import utilities for deferred module loading and attribute access. Truly lazy, truly late."
 readme = "README.md"
 requires-python = ">=3.12"
 license-files = ["LICENSE-Apache-2.0", "LICENSE-MIT", "LICENSES/*"]
@@ -22,7 +22,7 @@ keywords = [
   "loading",
   "module",
   "proxy",
-  "utilities"
+  "utilities",
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -36,6 +36,11 @@ classifiers = [
   "Typing :: Typed",
 ]
 
+[project.urls]
+Homepage = "https://github.com/knitli/lateimport"
+Repository = "https://github.com/knitli/lateimport"
+Issues = "https://github.com/knitli/lateimport/issues"
+
 [dependency-groups]
 dev = [
   "pytest>=9.0.0",
@@ -47,10 +52,27 @@ dev = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build.hooks.version]
+path = "src/lateimport/_version.py"
+# The reuse statements prevent REUSE from considering this snippet for license compliance, which would error
+# REUSE-IgnoreStart
+template = '''# SPDX-FileCopyrightText: 2026 Knitli Inc.
+# SPDX-License-Identifier: MIT OR Apache-2.0
+"""Version information for lateimport."""
+from typing import Final
+
+
+__version__: Final[str] = "{version}"
+
+__all__ = ("__version__",)
+'''
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/lateimport"]
 
-[tool.pytest]
+# REUSE-IgnoreEnd
+
+[tool.pytest.ini_options]
 markers = [
   "benchmark: marks tests as benchmark/performance tests",
   "performance: marks tests as performance tests",
