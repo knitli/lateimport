@@ -8,6 +8,7 @@ import sys
 import threading
 
 from types import ModuleType
+from typing import Literal
 
 import pytest
 
@@ -29,7 +30,7 @@ class TestLazyImportBasics:
 
         # Should not be resolved yet
         assert not os_lazy.is_resolved()
-        assert "not resolved" in repr(os_lazy)
+        assert "pending" in repr(os_lazy)
 
         # Access an attribute - should still not resolve
         path_lazy = os_lazy.path
@@ -114,7 +115,7 @@ class TestLazyImportErrors:
         """Test ImportError for non-existent module."""
         lazy = lazy_import("nonexistent_module_xyz")
 
-        with pytest.raises(ImportError, match="Cannot import module"):
+        with pytest.raises(ImportError, match="cannot import module"):
             lazy._resolve()
 
     def test_attribute_not_found(self) -> None:
@@ -244,6 +245,7 @@ class TestLazyImportRealWorldUseCases:
 
         class MyClass:
             """A simple class for testing lazy import of types."""
+
             def __init__(self, x):
                 self.x = x
 
@@ -312,13 +314,13 @@ class TestLazyImportMagicMethods:
 
         repr_ = repr(lazy)
         assert "os.path.join" in repr_
-        assert "not resolved" in repr_
+        assert "pending" in repr_
 
         # Resolve it
         lazy._resolve()
         repr_ = repr(lazy)
         assert "resolved" in repr_
-        assert "not resolved" not in repr_
+        assert "pending" not in repr_
 
     def test_dir(self) -> None:
         """Test __dir__ forwards to resolved object."""
@@ -536,67 +538,53 @@ class TestLazyImportPerformance:
 @pytest.mark.benchmark
 @pytest.mark.performance
 class TestLazyImportIntrospection:
-    """Test LazyImport compatibility with introspection tools like inspect and pydantic."""
+    """Test LazyImport compatibility with introspection tools."""
 
     def test_inspect_signature_compatibility(self) -> None:
-        """Test that inspect.signature() works with LazyImport objects."""
+        """Test that inspect.signature() works with a lazy-imported function."""
+        import sys
+
         from inspect import signature
 
-        # Create a lazy import to a function
-        get_settings_lazy = lazy_import("codeweaver.server", "get_settings")
+        # Build a small in-process module with a function that has a signature.
+        test_module = ModuleType("test_sig_module")
 
-        # This should not raise AttributeError
-        sig = signature(get_settings_lazy)
+        def sample_func(x: int, y: str = "hello") -> str:
+            return f"{x}-{y}"
 
-        # Verify we got a valid signature
-        assert sig is not None
-        # get_settings uses **kwargs, so check for that in the signature
-        assert "kwargs" in str(sig)
-
-        # The lazy import should now be resolved
-        assert get_settings_lazy.is_resolved()
-
-    def test_pydantic_default_factory_compatibility(self) -> None:
-        """Test that LazyImport can be used as a pydantic default_factory."""
-        from pydantic import Field
-        from pydantic.dataclasses import dataclass
-
-        # Use a simple function that returns a default value
-        # This tests the pattern without requiring complex validation
-        def get_default_dict():
-            return {"test": "value"}
-
-        # Create lazy import to the function
-        test_module = ModuleType("test_default_module")
-        test_module.get_default_dict = get_default_dict
-        sys.modules["test_default_module"] = test_module
+        test_module.sample_func = sample_func
+        sys.modules["test_sig_module"] = test_module
 
         try:
-            get_default_lazy = lazy_import("test_default_module", "get_default_dict")
+            func_lazy = lazy_import("test_sig_module", "sample_func")
+            assert not func_lazy.is_resolved()
 
-            @dataclass
-            class TestModel:
-                settings: dict = Field(default_factory=get_default_lazy)
-
-            # This should not raise during schema generation
-            model = TestModel()
-            assert model.settings == {"test": "value"}
+            sig = signature(func_lazy)
+            assert sig is not None
+            assert "x" in str(sig)
+            assert func_lazy.is_resolved()
         finally:
-            del sys.modules["test_default_module"]
+            del sys.modules["test_sig_module"]
 
     def test_introspection_attributes_resolve(self) -> None:
-        """Test that accessing introspection attributes resolves the object."""
-        from codeweaver.server import get_settings
+        """Test that accessing an introspection attribute (__name__) resolves the object."""
+        test_module = ModuleType("test_introspect_module")
 
-        get_settings_lazy = lazy_import("codeweaver.server", "get_settings")
+        def my_function() -> None:
+            pass
 
-        # Should not be resolved yet
-        assert not get_settings_lazy.is_resolved()
+        test_module.my_function = my_function
+        sys.modules["test_introspect_module"] = test_module
 
-        # Accessing __name__ should resolve
-        name = get_settings_lazy.__name__
-        assert name == get_settings.__name__
-        assert get_settings_lazy.is_resolved()
+        try:
+            func_lazy = lazy_import("test_introspect_module", "my_function")
+            assert not func_lazy.is_resolved()
+
+            name = func_lazy.__name__
+            assert name == "my_function"
+            assert func_lazy.is_resolved()
+        finally:
+            del sys.modules["test_introspect_module"]
 
     def test_introspection_attributes_missing(self) -> None:
         """Test that missing introspection attributes raise AttributeError."""

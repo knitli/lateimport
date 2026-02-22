@@ -16,8 +16,8 @@ Provides two complementary tools:
 
         from lateimport import lazy_import
 
-        numpy = lazy_import("numpy")           # no import yet
-        result = numpy.array([1, 2, 3])        # imported here
+        numpy = lazy_import("numpy")  # no import yet
+        result = numpy.array([1, 2, 3])  # imported here
 
 ``create_lazy_getattr``
     Factory for the ``__getattr__`` hook embedded in package ``__init__.py``
@@ -30,9 +30,7 @@ Provides two complementary tools:
         from types import MappingProxyType
         from lateimport import create_lazy_getattr
 
-        _dynamic_imports = MappingProxyType({
-            "MyClass": ("mypackage.core", "models"),
-        })
+        _dynamic_imports = MappingProxyType({"MyClass": ("mypackage.core", "models")})
         __getattr__ = create_lazy_getattr(_dynamic_imports, globals(), __name__)
 """
 
@@ -163,9 +161,7 @@ class LazyImport[Import: Any]:
                 module_name = object.__getattribute__(self, "_module_name")
                 attrs = object.__getattribute__(self, "_attrs")
                 path = f"{module_name}.{'.'.join(attrs)}" if attrs else module_name
-                raise AttributeError(
-                    f"lateimport: attribute {name!r} not found on {path!r}"
-                ) from e
+                raise AttributeError(f"lateimport: attribute {name!r} not found on {path!r}") from e
 
         module_name = object.__getattribute__(self, "_module_name")
         attrs = object.__getattribute__(self, "_attrs")
@@ -186,6 +182,7 @@ class LazyImport[Import: Any]:
         return dir(self._resolve())
 
     def __repr__(self) -> str:
+        """Return a human-readable representation showing the target path and resolution status."""
         module_name = object.__getattribute__(self, "_module_name")
         attrs = object.__getattribute__(self, "_attrs")
         resolved = object.__getattribute__(self, "_resolved")
@@ -236,7 +233,7 @@ def create_lazy_getattr(
     alongside a ``_dynamic_imports`` dispatch table of the form::
 
         _dynamic_imports = MappingProxyType({
-            "SymbolName": ("package.submodule", "module_file"),
+            "SymbolName": ("package.submodule", "module_file")
         })
         __getattr__ = create_lazy_getattr(_dynamic_imports, globals(), __name__)
 
@@ -263,9 +260,7 @@ def create_lazy_getattr(
         try:
             package, target_module = dynamic_imports[attr_name]
         except KeyError as e:
-            raise AttributeError(
-                f"module {module_name!r} has no attribute {attr_name!r}"
-            ) from e
+            raise AttributeError(f"module {module_name!r} has no attribute {attr_name!r}") from e
 
         if target_module == "__module__":
             result = import_module(f".{attr_name}", package=package)
@@ -285,9 +280,4 @@ def create_lazy_getattr(
     return __getattr__
 
 
-__all__ = (
-    "INTROSPECTION_ATTRIBUTES",
-    "LazyImport",
-    "create_lazy_getattr",
-    "lazy_import",
-)
+__all__ = ("INTROSPECTION_ATTRIBUTES", "LazyImport", "create_lazy_getattr", "lazy_import")

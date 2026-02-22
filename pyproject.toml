@@ -7,19 +7,28 @@
 name = "lateimport"
 version = "0.1.0"
 description = "Lazy import utilities for deferred module loading and attribute access."
+readme = "README.md"
 requires-python = ">=3.12"
+license-files = ["LICENSE-Apache-2.0", "LICENSE-MIT", "LICENSES/*"]
 authors = [
   { name = "Knitli Inc." },
   { name = "Adam Poulemanos", email = "adam@knit.li" },
 ]
-license = { text = "MIT OR Apache-2.0" }
-readme = "README.md"
-keywords = ["lazy", "import", "deferred", "proxy"]
+keywords = [
+  "attribute",
+  "deferred",
+  "import",
+  "lazy",
+  "loading",
+  "module",
+  "proxy",
+  "utilities"
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
   "License :: OSI Approved :: Apache Software License",
+  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
@@ -40,3 +49,12 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/lateimport"]
+
+[tool.pytest]
+markers = [
+  "benchmark: marks tests as benchmark/performance tests",
+  "performance: marks tests as performance tests",
+  "unit: marks tests as unit tests",
+]
+minversion = "9.0"
+testpaths = ["tests"]

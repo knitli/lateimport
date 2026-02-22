@@ -9,7 +9,6 @@ from __future__ import annotations
 import threading
 
 from types import MappingProxyType
-from unittest.mock import patch
 
 import pytest
 
@@ -23,6 +22,7 @@ from lateimport import LazyImport, create_lazy_getattr, lazy_import
 
 class TestLazyImportCreation:
     """Test creation and basic properties of LazyImport objects returned by lazy_import()."""
+
     def test_not_resolved_on_creation(self) -> None:
         """Test that a new LazyImport is not resolved."""
         proxy = lazy_import("os")
@@ -48,6 +48,7 @@ class TestLazyImportCreation:
 
 class TestLazyImportResolution:
     """Test the resolution behavior of LazyImport objects, including caching and error handling."""
+
     def test_resolves_module(self) -> None:
         """Test that a LazyImport can resolve a module."""
         import os
@@ -84,6 +85,7 @@ class TestLazyImportResolution:
 
 class TestLazyImportAttributeChaining:
     """Test that accessing attributes on a LazyImport returns new LazyImport proxies that can be resolved correctly."""
+
     def test_chained_attribute_creates_child_proxy(self) -> None:
         """Test that accessing an attribute on a LazyImport returns a new LazyImport proxy for that attribute."""
         proxy = lazy_import("os")
@@ -108,6 +110,7 @@ class TestLazyImportAttributeChaining:
 
 class TestLazyImportErrors:
     """Test error handling behavior of LazyImport, including import errors and attribute errors."""
+
     def test_bad_module_raises_import_error(self) -> None:
         """Test that a LazyImport raises ImportError for a non-existent module."""
         proxy = lazy_import("no_such_module_xyzzy")
@@ -131,6 +134,7 @@ class TestLazyImportErrors:
 
 class TestLazyImportThreadSafety:
     """Test that LazyImport resolution is thread-safe and that concurrent resolutions return the same object."""
+
     def test_concurrent_resolution_returns_same_object(self) -> None:
         """Test that resolving the same LazyImport concurrently from multiple threads returns the same resolved object."""
         proxy = lazy_import("os")
@@ -157,6 +161,7 @@ class TestLazyImportThreadSafety:
 
 class TestCreateLazyGetattr:
     """Test the behavior of the create_lazy_getattr function, which creates a __getattr__ function that lazily imports attributes based on a dispatch mapping."""
+
     def _make_getattr(self, dispatch: dict[str, tuple[str, str]]) -> object:
         """Helper method to create a lazy __getattr__ function and its associated globals dict for testing."""
         g: dict[str, object] = {}
@@ -203,7 +208,7 @@ class TestCreateLazyGetattr:
 
     def test_module_mode(self) -> None:
         """Test that when the target module is '__module__', the submodule itself is imported.
-        
+
         target_module == '__module__' imports the submodule itself.
         """
         dispatch = {"path": ("os", "__module__")}
