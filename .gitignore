@@ -1,25 +1,233 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.so
-*.egg
-*.egg-info/
+# SPDX-FileCopyrightText: 2025 Knitli Inc.
+# SPDX-FileContributor: Adam Poulemanos <adam@knit.li>
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+# local configs
+.claude/*.local.*
+**/*.local.*
+**/*.local.*.license
+mise.local.toml
+mise.*.local.toml
+mise.local.toml.license
+mise.*.local.toml.license
+hk.local.pkl.license
+.ruff_cache
+.roo/mcp.json
+# local terminal zsh config -- can contain sensitive info
+.vscode/terminal.local.zsh
+*mcp*.backup*
+
+# CLAUDE.md -- we symlink this file from AGENTS.md in the setup script
+CLAUDE.md
+GEMINI.md
+
+# non-public working files
+.workbench/
+.devenv/
+.testbuild/
+.history
+.temp/
+
+# Workspace files
+*.code-workspace
+*.code-workspace.license
+
+# mkdocs
+.cache
+
+# Playwright
+logs
+_.log
+report.[0-9]_[0-9]_[0-9]_[0-9]_.json
+out
 dist/
-build/
-.eggs/
+*.tgz
+coverage
+*.lcov
+.env
+*.local.*
+*.local
+.eslintcache
+.cache
+!.cache/uv/
+*.tsbuildinfo
+**/dist/
+
+# venv
+**/.venv
 .venv/
 
-# Testing / coverage
+# node and docs-site
+node_modules/
+**/node_modules/
+docs-site/dist/
+docs-site/.cache/
+docs-site/.astro/
+
+# Cache files
+**/__pycache__/
+**/.pytest_cache/
+__pycache__/
 .pytest_cache/
+.eslintcache
+# Visual Studio cache files
+# files ending in .cache can be ignored
+*.[Cc]ache
+.pytest_cache
+
+dist/
+site/
+*.tar
+*.tar.*
+*.jar
+*.exe
+*.msi
+*.zip
+*.tgz
+*.log
+*.log.*
+*.sig
+
+.DS_Store
+*.swp
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Local config
+ipython_config.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.tlog
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Including strong name files can present a security risk
+# (https://github.com/github/gitignore/pull/2483#issue-259490424)
+*.snk
+
+# (https://github.com/github/gitignore/pull/1529#issuecomment-104372622)
+bower_components/
+
+# Local History for Visual Studio Code
+.history/
+lib64/
+remote-debug-profile/
+
+# zcomp and zhistory files
+.vscode/zsh/.zcompdump
+.vscode/zsh/.zcompdump-*
+.vscode/zsh/.zsh_history
+
+__pycache__/
+**/.pytest_cache/
+.pytest_cache/
+# //!SECTION  EXCEPTIONS -- Put all inverted ("!") rules at the end of the file!
+
+# but keep track of directories ending in .cache
+!?*.[Cc]ache/
+
+# Leave launch.json public
+!.vscode/launch.json
+!.vscode/launch.json.license
+
+# Leave settings.json and workspace zshrc/init public
+!.vscode/tasks.json
+!.vscode/tasks.json.license
+!.vscode/extensions.json
+!.vscode/extensions.json.license
+!.vscode/mcp.json
+!.vscode/mcp.json.license
+!.vscode/settings.json
+!.vscode/settings.json.license
+!.vscode/terminal.extra.zsh
+!.vscode/terminal.extra.zsh.example
+!.vscode/zsh/.zshrc
+
+# project-level git files that should be public and easily get caught in ignores
+!.gitattributes
+!.gitconfig.license
+!.gitignore
+!.gitconfig
+!.mailmap
+
+!.cache/uv/
+
+# Generated Files
+**/htmlcov/
 .coverage
+.coveragexml
+.vscode/.history/
+coverage.xml
+docs-site/dist/
 htmlcov/
-.ruff_cache/
+lcov-report/
+server.json
+server.json.license
+server.yaml
+server.yaml.license
+src/codeweaver/_version.py
+test-results.xml
 
-# Type checkers
-.mypy_cache/
-.ty_cache/
+.jj/
 
-# uv
-uv.lock
+# Finally, stuff we *really* don't want to let leak
+.local.env
+.codeweaver.local.env
+.codeweaver/local.env
+mise.local.toml
+mise.local.env
+
+.gemini/
+gha-creds-*.json

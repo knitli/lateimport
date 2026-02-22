@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Knitli Inc.
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[tools]
+uv = "latest"
+tombi = "latest"
+ruff = "latest"
+ty = "latest"
+"pipx:reuse" = "latest"
