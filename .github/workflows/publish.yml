@@ -21,7 +21,9 @@ jobs:
         with:
           python-version: "3.12"
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - run: uv build
+      - run: |
+          uvx reuse spdx --add-license-concluded --creator-organization "Knitli Inc." -o sbom.spdx || true
+          uv build
       - uses: actions/upload-artifact@v4
         with:
           name: dist
