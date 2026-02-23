@@ -108,7 +108,8 @@ from lateimport import create_late_getattr
 _dynamic_imports = MappingProxyType({
     "MyClass":      ("mypackage.core",   "models"),
     "my_function":  ("mypackage.utils",  "helpers"),
-    "SubModule":    ("mypackage",        "__module__"),
+    # for the current package you can just use __spec__.parent:
+    "SubModule":    (__spec__.parent,        "__module__"),
 })
 
 __getattr__ = create_late_getattr(_dynamic_imports, globals(), __name__)
@@ -159,4 +160,4 @@ Create a `__getattr__` function for package-level lazy loading.
 
 ## License
 
-`MIT OR Apache-2.0` — see [LICENSE-MIT](LICENSE-MIT) and [LICENSE-Apache-2.0](LICENSE-Apache-2.0).
+`MIT OR Apache-2.0` — see [LICENSE-MIT](LICENSES/MIT.txt) and [LICENSE-Apache-2.0](LICENSES/Apache-2.0.txt).
