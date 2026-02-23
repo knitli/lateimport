@@ -7,4 +7,91 @@ uv = "latest"
 tombi = "latest"
 ruff = "latest"
 ty = "latest"
+typos = "latest"
 "pipx:reuse" = "latest"
+
+[settings]
+idiomatic_version_file_enable_tools = []
+
+[tasks]
+[tasks.test]
+run = "PYTHONPATH=src uv run pytest tests"
+description = "Run the test suite with pytest."
+
+[tasks.testcov]
+run = '''PYTHONPATH=src uv run pytest tests/ --cov=lateimport --cov-report=xml --cov-report=term-missing --junit-xml=test-results.xml'''
+description = "Run the test suite with pytest and generate a coverage report in XML format."
+
+[tasks.venv]
+usage = '''
+flag "--clear" help="Clear the existing virtual environment before creating a new one."
+'''
+run = '''
+if [ "${usage_clear}" = "true" ]; then
+  uv venv --clear --seed -p 3.12 .venv
+else
+  uv venv --seed -p 3.12 --allow-existing .venv
+fi
+'''
+tools.uv = "latest"
+
+[tasks.source]
+depends = ["venv"]
+run = "source .venv/bin/activate"
+
+[tasks.sync]
+depends = ["venv"]
+run = "uv sync --inexact"
+
+[tasks.annotate]
+tools."pipx:reuse" = "latest"
+run = '''reuse annotate -r -y 2026 --copyright "Knitli Inc." --license "MIT OR Apache-2.0" --skip-existing --fallback-dot-license ./'''
+
+[tasks.fix]
+usage = '''
+flag "--add" help="Automatically add changed files from fixes to git staging area."
+flag "--add-and-commit" help="Automatically add changed files from fixes to git staging area and commit with an amend."
+'''
+depends = ["annotate"]
+run = [
+  "ruff check --fix --unsafe-fixes src tests",
+  "ruff format src tests",
+  "typos -w",
+  "tombi format pyproject.toml ruff.toml mise.toml",
+]
+depends_post = '''
+if [ "${usage_add}" = "true" ]; then
+  git add .
+fi
+if [ "${usage_add_and_commit}" = "true" ]; then
+  git add .
+  git commit --amend --no-edit
+fi
+'''
+
+[tasks.fix.tools]
+ruff = "latest"
+tombi = "latest"
+typos = "latest"
+
+[tasks.lint]
+run = [
+  "ruff check src tests",
+  "typos",
+  "tombi lint pyproject.toml ruff.toml mise.toml",
+  "reuse lint",
+]
+
+[tasks.ci]
+depends = ["lint", "test"]
+description = "Run all CI checks, including linting and tests."
+
+[tasks.clean]
+run = [
+  "rm -rf .venv dist build .pytest_cache .ruff_cache .coverage test-results.xml",
+  "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true",
+  '''find . -type f -name "*.pyc" -delete 2>/dev/null || true''',
+  "mise cache clear",
+  "uv cache clean --force",
+]
+depends_post = ["sync"]

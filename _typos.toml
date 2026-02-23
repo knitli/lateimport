@@ -1,0 +1,103 @@
+# SPDX-FileCopyrightText: 2025 Knitli Inc.
+# SPDX-FileContributor: Adam Poulemanos <adam@knit.li>
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[files]
+extend-exclude = [
+  ".git",
+  ".venv",
+  "build",
+  "dist",
+  "__pycache__",
+  "src/lateimport/_version.py",
+  "LICENSE*",
+  "uv.lock"
+]
+ignore-hidden = false
+ignore-files = true
+
+[default]
+binary = false
+check-filename = true
+check-file = true
+unicode = true
+ignore-hex = true
+identifier-leading-digits = false
+locale = "en-us"
+extend-ignore-identifiers-re = []
+extend-ignore-words-re = []
+extend-ignore-re = [
+  '(?s)(#|//)\s*spellchecker:off.*?\n\s*(#|//)\s*spellchecker:on',
+]
+
+[default.extend-identifiers]
+
+[default.extend-words]
+
+[type.py]
+extend-glob = []
+binary = false
+check-filename = true
+check-file = true
+unicode = true
+ignore-hex = true
+identifier-leading-digits = false
+locale = "en-us"
+extend-ignore-identifiers-re = []
+extend-ignore-words-re = []
+extend-ignore-re = [
+  '(?s)(#|//)\s*spellchecker:off.*?\n\s*(#|//)\s*spellchecker:on',
+]
+
+[type.py.extend-identifiers]
+NDArray = "NDArray"
+arange = "arange"
+EOFError = "EOFError"
+
+[type.py.extend-words]
+
+[type.md]
+extend-glob = []
+binary = false
+check-filename = true
+check-file = true
+unicode = true
+ignore-hex = true
+identifier-leading-digits = false
+locale = "en-us"
+extend-ignore-identifiers-re = []
+extend-ignore-words-re = ["GUD"]
+extend-ignore-re = [
+  '(?s)(#|//)\s*spellchecker:off.*?\n\s*(#|//)\s*spellchecker:on',
+]
+
+[type.json]
+extend-glob = []
+binary = false
+check-filename = true
+check-file = true
+unicode = true
+ignore-hex = true
+identifier-leading-digits = false
+locale = "en-us"
+extend-ignore-identifiers-re = []
+extend-ignore-words-re = ["tha|bre"]
+extend-ignore-re = [
+  '(?s)(#|//)\s*spellchecker:off.*?\n\s*(#|//)\s*spellchecker:on',
+]
+
+[type.toml]
+extend-glob = []
+binary = false
+check-filename = true
+check-file = true
+unicode = true
+ignore-hex = true
+identifier-leading-digits = false
+locale = "en-us"
+extend-ignore-identifiers-re = []
+extend-ignore-words-re = ["uv", "tombi", "ruff", "ty", "typos", "reuse"]
+extend-ignore-re = [
+  '(?s)(#|//)\s*spellchecker:off.*?\n\s*(#|//)\s*spellchecker:on',
+]

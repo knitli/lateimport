@@ -11,6 +11,7 @@ Lazy import utilities for Python — defer module loading until an imported obje
 [![PyPI](https://img.shields.io/pypi/v/lateimport)](https://pypi.org/project/lateimport/)
 [![Python](https://img.shields.io/pypi/pyversions/lateimport)](https://pypi.org/project/lateimport/)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)](LICENSE-MIT)
+[![CI](https://github.com/knitli/lateimport/actions/workflows/ci.yml/badge.svg)](https://github.com/knitli/lateimport/actions/workflows/ci.yml)
 
 ## Overview
 

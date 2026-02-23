@@ -75,7 +75,7 @@ class LateImport[Import: Any]:
     The import is triggered the first time the object is *used* — called,
     passed to ``isinstance``, subscripted, etc. — not when it is referenced.
 
-    Thread-safe: concurrent resolution is serialised with a lock and the
+    Thread-safe: concurrent resolution is serialized with a lock and the
     result is cached after the first successful import.
 
     Example::

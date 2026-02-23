@@ -5,10 +5,9 @@
 
 [project]
 name = "lateimport"
-version = "0.1.0"
 description = "Lazy import utilities for deferred module loading and attribute access. Truly lazy, truly late."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12"  # We use parameterized generics, because `Generic` is ugly.
 license-files = ["LICENSE-Apache-2.0", "LICENSE-MIT", "LICENSES/*"]
 authors = [
   { name = "Knitli Inc." },
@@ -35,22 +34,27 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Typing :: Typed",
 ]
+dynamic = ["version"]
 
 [project.urls]
 Homepage = "https://github.com/knitli/lateimport"
-Repository = "https://github.com/knitli/lateimport"
 Issues = "https://github.com/knitli/lateimport/issues"
+Repository = "https://github.com/knitli/lateimport"
 
 [dependency-groups]
 dev = [
   "pytest>=9.0.0",
+  "pytest-cov>=7.0.0",
   "pytest-mock>=3.15.1",
   "ruff>=0.15.0",
 ]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "uv-dynamic-versioning"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
 
 [tool.hatch.build.hooks.version]
 path = "src/lateimport/_version.py"
@@ -67,16 +71,47 @@ __version__: Final[str] = "{version}"
 __all__ = ("__version__",)
 '''
 
+# REUSE-IgnoreEnd
 [tool.hatch.build.targets.wheel]
 packages = ["src/lateimport"]
 
-# REUSE-IgnoreEnd
-
-[tool.pytest.ini_options]
+[tool.pytest]
 markers = [
   "benchmark: marks tests as benchmark/performance tests",
   "performance: marks tests as performance tests",
   "unit: marks tests as unit tests",
 ]
 minversion = "9.0"
+python_classes = ["Test*"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
 testpaths = ["tests"]
+
+[tool.ty.environment]
+python-version = "3.12"
+root = ["./src", "./tests", "./scripts", "./mise-tasks", "./packages"]
+python = "./.venv"
+extra-paths = ["./typings"]
+
+[tool.ty.rules]
+# === Core Type Safety Rules (kept strict for src/) ===
+# These remain as errors by default and will catch real bugs in production code
+
+# === Test Framework Limitations ===
+# ty doesn't understand pytest mocks/fixtures - these are inherent limitations, not real bugs
+possibly-missing-attribute = "ignore"  # Pytest fixtures don't have static attributes
+unresolved-attribute = "warn"  # Test mocks may have dynamic attributes
+unknown-argument = "warn"  # Pytest fixtures injected dynamically
+unresolved-reference = "warn"  # Test references may be dynamic
+# === Type Inference Limitations ===
+# ty is overly strict with Literal inference in dict lookups and dynamic patterns
+invalid-argument-type = "warn"  # Many false positives in capabilities dicts and code gen
+missing-typed-dict-key = "warn"  # Often false positive with dynamic TypedDict construction (e.g., **dict comprehension)
+# === Style and Refactoring Suggestions ===
+redundant-cast = "ignore"  # Informational only, not bugs
+# === Optional Dependencies ===
+# Scripts may import optional dependencies (e.g., mkdocs_gen_files, black)
+unresolved-import = "warn"  # Downgrade to warn for optional dependencies
+
+[tool.uv-dynamic-versioning]
+fallback-version = "0.0.0"

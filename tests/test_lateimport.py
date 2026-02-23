@@ -82,6 +82,18 @@ class TestLateImportResolution:
         second = proxy._resolve()
         assert first is second
 
+    def test_do_resolve_double_check(self) -> None:
+        """Test the double-checked locking path: _do_resolve returns early if already resolved.
+
+        This exercises the branch where a second thread acquires the lock after the first
+        thread has already set ``_resolved``, hitting the early-return guard.
+        """
+        import os
+
+        proxy = lateimport("os")
+        object.__setattr__(proxy, "_resolved", os)
+        assert proxy._do_resolve() is os
+
 
 class TestLateImportAttributeChaining:
     """Test that accessing attributes on a LateImport returns new LateImport proxies that can be resolved correctly."""
@@ -225,3 +237,19 @@ class TestCreateLazyGetattr:
         fn, _ = self._make_getattr({})
         with pytest.raises(AttributeError, match="test_module"):
             fn("nope")
+
+
+# ---------------------------------------------------------------------------
+# Version metadata
+# ---------------------------------------------------------------------------
+
+
+class TestVersionInfo:
+    """Test that version metadata is available."""
+
+    def test_version_is_string(self) -> None:
+        """Test that __version__ is defined as a string in lateimport._version."""
+        from lateimport._version import __version__
+
+        assert isinstance(__version__, str)
+        assert __version__  # non-empty
