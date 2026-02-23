@@ -5,8 +5,20 @@
 name: Publish
 
 on:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to release
+        required: true
+        type: string
   release:
-    types: [published]
+    types:
+      - published
 
 jobs:
   build:
