@@ -36,6 +36,7 @@ There are a lot of late/lazy/delayed import solutions out there. Lateimport's ma
 
 - Complete type checking support
 - **Actually lazy**. Most lazy patterns delay until the lazy object is in scope. **lateimport delays imports until they are actually directly accessed** (i.e. you access an attribute or call it).
+- **Get linting and automation with [Exportify](https://github.com/knitli/exportify)**. Exportify is a CLI development tool that lets you declaratively set rules for import and export patterns, and validate all lazy imports from lateimport. You can say goodbye to broken lazy imports and updating `__all__`.
 
 ## Requirements
 
