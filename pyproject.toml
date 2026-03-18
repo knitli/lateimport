@@ -24,7 +24,7 @@ keywords = [
   "utilities",
 ]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: Apache Software License",
   "License :: OSI Approved :: MIT License",
@@ -40,6 +40,7 @@ dynamic = ["version"]
 Homepage = "https://github.com/knitli/lateimport"
 Issues = "https://github.com/knitli/lateimport/issues"
 Repository = "https://github.com/knitli/lateimport"
+Changelog = "https://github.com/knitli/lateimport/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
