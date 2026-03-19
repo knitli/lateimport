@@ -6,14 +6,12 @@ name: Publish
 
 on:
   push:
-    branches:
-      - main
     tags:
       - v*
   workflow_dispatch:
     inputs:
       tag:
-        description: Tag to release
+        description: Tag to release (e.g. v1.2.3)
         required: true
         type: string
   release:
@@ -28,14 +26,41 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Resolve ref
+        id: ref
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "ref=refs/tags/${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7
+        with:
+          ref: ${{ steps.ref.outputs.ref }}
+          # Full history is required so uv-dynamic-versioning / git describe
+          # can find the tag and produce a clean version string.
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - run: |
+
+      - name: Build sdist and wheel
+        run: |
           uvx reuse spdx --add-license-concluded --creator-organization "Knitli Inc." -o sbom.spdx || true
           uv build
+
+      - name: Verify version is not a fallback/dirty build
+        run: |
+          version=$(uvx hatch version)
+          echo "Resolved version: $version"
+          if [[ "$version" == "0.0.0" || "$version" == *".dev"* || "$version" == *"+d"* ]]; then
+            echo "ERROR: version '$version' looks like a dirty or fallback build. Aborting."
+            exit 1
+          fi
+
       - uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -53,7 +78,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist/
