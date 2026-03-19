@@ -2,6 +2,7 @@
 # SPDX-FileContributor: Adam Poulemanos <adam@knit.li>
 #
 # SPDX-License-Identifier: MIT OR Apache-2.0
+#:tombi schema.strict = false
 
 [project]
 name = "lateimport"
@@ -37,10 +38,10 @@ classifiers = [
 dynamic = ["version"]
 
 [project.urls]
+Changelog = "https://github.com/knitli/lateimport/blob/main/CHANGELOG.md"
 Homepage = "https://github.com/knitli/lateimport"
 Issues = "https://github.com/knitli/lateimport/issues"
 Repository = "https://github.com/knitli/lateimport"
-Changelog = "https://github.com/knitli/lateimport/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
@@ -109,10 +110,18 @@ unresolved-reference = "warn"  # Test references may be dynamic
 invalid-argument-type = "warn"  # Many false positives in capabilities dicts and code gen
 missing-typed-dict-key = "warn"  # Often false positive with dynamic TypedDict construction (e.g., **dict comprehension)
 # === Style and Refactoring Suggestions ===
-redundant-cast = "ignore"  # Informational only, not bugs
+redundant-cast = "warn"  # Informational only, not bugs
 # === Optional Dependencies ===
 # Scripts may import optional dependencies (e.g., mkdocs_gen_files, black)
 unresolved-import = "warn"  # Downgrade to warn for optional dependencies
+
+[[tool.ty.overrides]]
+include = ["tests/*.py"]
+
+[tool.ty.overrides.rules]
+unresolved-attribute = "ignore"  # intentional test mocks and fixtures with dynamic attributes
+call-non-callable = "ignore"  # intentional test mocks that may not be statically callable
+not-iterable = "ignore"  # Dynamic import tuples that ty can't infer as iterable
 
 [tool.uv-dynamic-versioning]
 fallback-version = "0.0.0"
