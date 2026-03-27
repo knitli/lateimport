@@ -6,6 +6,10 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # Changelog
 
+## v1.0.1
+
+- No notable changes, bumping to overcome a pypi metadata issue.
+
 ## v1.0.0
 
 - No breaking changes. Bumping to 1.0 to reflect stable, feature-complete status.
